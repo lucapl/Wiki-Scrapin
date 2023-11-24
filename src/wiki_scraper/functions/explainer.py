@@ -17,8 +17,9 @@ def explain(df,tfidf,recommendation):
         _,_,text = get_title_and_text(url)
         q_array = tfidf.transform([" ".join(word_stemmer(text))]).toarray()[0]
         
-        values = pd.Series(q_array, index=df.columns).sort_values()[::-1][:20]
-        x,y = values.index,values
+        full_q_values = pd.Series(q_array, index=df.columns).sort_values()[::-1]
+        q_values = full_q_values[:20]
+        x,y = q_values.index,q_values
         colors = dict([(a,color_palette[i]) for i,a in enumerate(x)])
         fig, ax = plt.subplots(len(recommends)+1,1,figsize = (10,10))
         fig.tight_layout(pad=5.0)
@@ -28,7 +29,8 @@ def explain(df,tfidf,recommendation):
         ax[0].tick_params(labelrotation=45)
         for i in range(0,len(recommends)):
             r_url = recommends.index[i]
-            values = df.loc()[r_url].sort_values()[::-1][:20]
+            #values = df.loc[r_url,full_q_values.index][:20]
+            values = df.loc[r_url].sort_values()[::-1][:20]
             x,y = values.index,values
             ax[i+1].bar(x,y,
                         color=[colors.get(color,"gray") for color in x])

@@ -1,4 +1,5 @@
-from src.wiki_scraper.utils import *
+from src.wiki_scraper.functions.utils import *
+from src.wiki_scraper.functions.data_processing import *
 import sys
 import csv
 
