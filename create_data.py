@@ -1,8 +1,6 @@
-from _utils import *
-from sklearn.feature_extraction.text import TfidfVectorizer
-import pandas as pd
+from src.wiki_scraper.utils import *
 import sys
-from joblib import dump
+import csv
 
 
 def main(argv):
@@ -13,27 +11,24 @@ def main(argv):
     for _ in range(int(argv[1])):
         while True:
             title,url,text = get_title_and_text()
-            if len(text) != 0:
+            if len(text) > 2000:
                 break
-            print(f"Article {url} contains no interesting text, getting another...S")
+            print(f"Article {url} low amount of text, getting another...")
         
         titles.append(title)
         urls.append(url)
         print(f"Adding article: {title}...")
-        texts.append(" ".join(word_stemmer(text)))
+        texts.append(word_lemmatizer(text))
 
-    tfidf=TfidfVectorizer(use_idf=True, smooth_idf=False)
-
-    print("Transforming the data")
-    df = pd.DataFrame(tfidf.fit_transform(texts).toarray(), index=urls, columns=tfidf.get_feature_names_out())
+    to_write = tuple(map(lambda row: [row[0]]+row[1],zip(urls,texts)))
+    del texts
+    del urls
 
     output = ".\\data\\articles.csv"
-    model_output = ".\\model\\tfidf_model.joblib"
+    print("Writing the data...")
+    save_csv(to_write,output)
     print("Saved the data to",output)
-    df.to_csv(output)
-    print("Saved model to:",model_output)
-    dump(tfidf,model_output)
-    
+
     return 0
 
 if __name__ == '__main__':
